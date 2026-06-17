@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System Roadmap — BetBoom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #141414;
+  --bg-tertiary: #1f1f1f;
+  --bg-info: rgba(55, 138, 221, 0.12);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-info: #6FA8E8;
+  --text-success: #22C55E;
+  --text-warning: #F0B000;
+  --border-tertiary: rgba(255, 255, 255, 0.08);
+  --border-secondary: rgba(255, 255, 255, 0.16);
+  --accent: #F8E800;
+  --accent-hover: #FFD000;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0 0 32px;
+  gap: 16px;
+}
+
+.header-text h1 {
+  font-size: 28px;
+  font-weight: 500;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+
+.header-text p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.edit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--bg-info);
+  color: var(--text-info);
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.banner {
+  background: var(--bg-info);
+  color: var(--text-info);
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  margin: 0 0 32px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.banner strong { font-weight: 500; }
+
+.metric-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0 0 32px;
+}
+
+.metric {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 8px;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.metric-sub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 4px 0 0;
+}
+
+.progress-track {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 14px 0 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 24px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.tab:hover { color: var(--text-primary); }
+.tab.active { background: var(--bg-tertiary); color: var(--text-primary); }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 16px;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.filter {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 0.5px solid var(--border-tertiary);
+  border-radius: 14px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: inherit;
+}
+
+.filter:hover { border-color: var(--border-secondary); color: var(--text-primary); }
+.filter.active { background: var(--bg-secondary); border-color: var(--border-secondary); color: var(--text-primary); }
+
+.btn-primary {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover { background: var(--accent-hover); }
+
+.btn-secondary {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: transparent;
+  color: var(--text-primary);
+  border: 0.5px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-secondary:hover { background: var(--bg-secondary); }
+
+.btn-danger {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: transparent;
+  color: #EF4444;
+  border: 0.5px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-danger:hover { background: rgba(239, 68, 68, 0.08); }
+
+.legend {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 0 0 16px;
+  flex-wrap: wrap;
+}
+
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.list { display: flex; flex-direction: column; gap: 8px; }
+
+.item {
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border-tertiary);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  transition: border-color 0.15s;
+}
+
+.item:hover { border-color: var(--border-secondary); }
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.item-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.item-name { font-size: 14px; font-weight: 500; flex: 1; }
+.item-meta { font-size: 12px; color: var(--text-secondary); }
+.item-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+}
+.item-progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.item-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.item-progress-text {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  min-width: 32px;
+  text-align: right;
+}
+
+.item-toggle {
+  color: var(--text-tertiary);
+  font-size: 16px;
+  transition: transform 0.2s;
+}
+.item.open .item-toggle { transform: rotate(90deg); }
+
+.item-detail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 14px 0 0;
+  padding: 14px 0 0;
+  border-top: 0.5px solid var(--border-tertiary);
+  display: none;
+}
+.item.open .item-detail { display: block; }
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.check-box {
+  width: 18px;
+  height: 18px;
+  border: 0.5px solid var(--border-secondary);
+  border-radius: 4px;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: all 0.15s;
+}
+
+.check-box.done {
+  background: var(--text-success);
+  border-color: var(--text-success);
+  color: var(--bg-primary);
+}
+
+.check-box.readonly { cursor: default; opacity: 0.7; }
+
+.check-label { color: var(--text-primary); flex: 1; }
+.check-label.done { color: var(--text-tertiary); }
+
+.detail-field {
+  margin: 12px 0;
+}
+.detail-field-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 6px;
+}
+.detail-field-value {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.input, .select, .textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 0.5px solid var(--border-secondary);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--accent);
+}
+.textarea { resize: vertical; min-height: 60px; }
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 14px 0 0;
+  border-top: 0.5px solid var(--border-tertiary);
+}
+
+.month {
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border-tertiary);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin: 0 0 12px;
+}
+
+.month-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.month-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.month-title { font-size: 15px; font-weight: 500; }
+.month-sub { font-size: 12px; color: var(--text-secondary); margin: 4px 0 0; }
+
+.month-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.month-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.month-content {
+  display: none;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  border-top: 0.5px solid var(--border-tertiary);
+}
+
+.month.open .month-content { display: block; }
+
+.view { display: none; }
+.view.active { display: block; }
+
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 24px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 0.5px solid var(--border-tertiary);
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+
+.modal-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+}
+
+.form-row {
+  margin: 0 0 14px;
+}
+
+.form-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 6px;
+  display: block;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.modal-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin: 20px 0 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-secondary);
+}
+
+.error-banner {
+  background: rgba(239, 68, 68, 0.12);
+  color: #EF4444;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  margin: 0 0 16px;
+  font-size: 13px;
+  display: none;
+}
+
+.error-banner.show { display: block; }
+
+@media (max-width: 640px) {
+  .container { padding: 32px 16px 60px; }
+  .header h1 { font-size: 22px; }
+  .metric-row { grid-template-columns: repeat(2, 1fr); }
+  .item-progress { min-width: 60px; }
+  .month-stats { font-size: 11px; gap: 8px; }
+  .month-progress { min-width: 80px; }
+  .form-grid-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="header-text">
+      <h1>Design System Roadmap</h1>
+      <p>BetBoom — план развития на 6 месяцев</p>
+    </div>
+    <div id="edit-badge" class="edit-badge" style="display: none;">
+      <i class="ti ti-pencil" aria-hidden="true" style="font-size: 12px;"></i>
+      Режим редактирования
+    </div>
+  </div>
+
+  <div class="banner">
+    <strong><i class="ti ti-sun" aria-hidden="true" style="vertical-align:-2px;margin-right:4px;"></i>Параллельный трек:</strong> Сейчас в работе адаптация токенов под Light Theme. Тестирование на макетах продукта. Финализация запланирована на месяц 6.
+  </div>
+
+  <div id="error-banner" class="error-banner"></div>
+
+  <div class="metric-row">
+    <div class="metric">
+      <p class="metric-label">Готовность системы</p>
+      <p class="metric-value" id="total-progress">—</p>
+      <div class="progress-track"><div class="progress-fill" id="total-progress-bar" style="width: 0%;"></div></div>
+    </div>
+    <div class="metric">
+      <p class="metric-label">Полностью готово</p>
+      <p class="metric-value" id="metric-done">—</p>
+      <p class="metric-sub" id="metric-total">из 0 разделов</p>
+    </div>
+    <div class="metric">
+      <p class="metric-label">В работе</p>
+      <p class="metric-value" id="metric-wip">—</p>
+      <p class="metric-sub">активная разработка</p>
+    </div>
+    <div class="metric">
+      <p class="metric-label">Не начато</p>
+      <p class="metric-value" id="metric-todo">—</p>
+      <p class="metric-sub">в очереди</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-view="status">Текущий статус</button>
+    <button class="tab" data-view="plan">План на 6 месяцев</button>
+    <button class="tab" data-view="risks">Риски</button>
+  </div>
+
+  <div class="view active" data-view="status">
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background: var(--text-success);"></span>Готов (100%)</span>
+      <span class="legend-item"><span class="legend-dot" style="background: var(--text-warning);"></span>В работе</span>
+      <span class="legend-item"><span class="legend-dot" style="background: var(--text-info);"></span>Не начат</span>
+    </div>
+    <div class="toolbar">
+      <div class="filters">
+        <button class="filter active" data-filter="all">Все</button>
+        <button class="filter" data-filter="done">Готовые</button>
+        <button class="filter" data-filter="wip">В работе</button>
+        <button class="filter" data-filter="todo">Не начатые</button>
+      </div>
+      <button id="add-btn" class="btn-primary" style="display: none;">
+        <i class="ti ti-plus" aria-hidden="true" style="font-size: 14px;"></i>
+        Добавить раздел
+      </button>
+    </div>
+    <div id="status-list-container">
+      <div class="loading">Загрузка данных...</div>
+    </div>
+  </div>
+
+  <div class="view" data-view="plan">
+    <div id="plan-list-container">
+      <div class="loading">Загрузка данных...</div>
+    </div>
+  </div>
+
+  <div class="view" data-view="risks">
+    <div class="list">
+      <div class="item open">
+        <div class="item-row" style="cursor: default;">
+          <div class="item-status" style="background: var(--text-warning);"></div>
+          <div class="item-name">Продуктовые задачи съедают больше времени</div>
+          <span class="item-meta">Высокий</span>
+        </div>
+        <div class="item-detail" style="display: block; border: none; padding: 8px 0 0; margin: 8px 0 0;">
+          Сейчас на ДС выделяется 2,5–3 дня в неделю. При увеличении продуктовой нагрузки план сдвигается на 1–2 месяца.
+        </div>
+      </div>
+      <div class="item open">
+        <div class="item-row" style="cursor: default;">
+          <div class="item-status" style="background: var(--text-warning);"></div>
+          <div class="item-name">Несогласия от команды дизайна по архитектуре</div>
+          <span class="item-meta">Средний</span>
+        </div>
+        <div class="item-detail" style="display: block; border: none; padding: 8px 0 0; margin: 8px 0 0;">
+          Каждое несогласие добавляет 20–30% к сроку конкретного раздела. Митигация — фиксировать архитектурные принципы до начала работы.
+        </div>
+      </div>
+      <div class="item open">
+        <div class="item-row" style="cursor: default;">
+          <div class="item-status" style="background: var(--text-info);"></div>
+          <div class="item-name">Архитектурные решения принимаются одним человеком</div>
+          <span class="item-meta">Средний</span>
+        </div>
+        <div class="item-detail" style="display: block; border: none; padding: 8px 0 0; margin: 8px 0 0;">
+          Возможны возвраты к ранним разделам через 2–3 месяца если решение окажется неоптимальным при масштабировании.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="add-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Добавить раздел</div>
+    <p class="modal-sub" id="modal-sub">Заполни данные о новом компоненте дизайн-системы</p>
+
+    <div class="form-row">
+      <label class="form-label">Название</label>
+      <input type="text" class="input" id="form-name" placeholder="Например: Button">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Готовность</label>
+      <div class="modal-checks" id="modal-checks">
+        <div class="check-row">
+          <div class="check-box" data-check="figma_done"></div>
+          <div class="check-label">Компонент в Figma</div>
+        </div>
+        <div class="check-row">
+          <div class="check-box" data-check="docs_done"></div>
+          <div class="check-label">Documentation (Anatomy, State)</div>
+        </div>
+        <div class="check-row">
+          <div class="check-box" data-check="variants_done"></div>
+          <div class="check-label">Type / Style / Size</div>
+        </div>
+        <div class="check-row">
+          <div class="check-box" data-check="tokens_done"></div>
+          <div class="check-label">Токены привязаны</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-grid-2">
+      <div class="form-row">
+        <label class="form-label">Дней на разработку</label>
+        <input type="number" class="input" id="form-days" min="0" value="0">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Спринт</label>
+        <select class="select" id="form-sprint">
+          <option value="">Не назначен</option>
+          <option value="month1">Месяц 1</option>
+          <option value="month2">Месяц 2</option>
+          <option value="month3">Месяц 3</option>
+          <option value="month4">Месяц 4</option>
+          <option value="month5">Месяц 5</option>
+          <option value="month6">Месяц 6</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Заметка</label>
+      <textarea class="textarea" id="form-note" placeholder="Опционально"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" id="modal-cancel">Отмена</button>
+      <button class="btn-primary" id="modal-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://oknrvwkytfwfmftzoeiy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rbnJ2d2t5dGZ3Zm1mdHpvZWl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2OTAzNTQsImV4cCI6MjA5NzI2NjM1NH0.ZJzKWhfhSunW8ASI1NmXlYcsvQZBiSshkVmufRKlz78';
+const EDIT_KEY = 'Candyveq@2506';
+
+const params = new URLSearchParams(window.location.search);
+const isEditMode = params.get('edit') === EDIT_KEY;
+
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let components = [];
+let currentFilter = 'all';
+let editingId = null;
+let formState = { figma_done: false, docs_done: false, variants_done: false, tokens_done: false };
+
+const SPRINT_LABELS = {
+  '': 'Не назначен',
+  month1: 'Месяц 1',
+  month2: 'Месяц 2',
+  month3: 'Месяц 3',
+  month4: 'Месяц 4',
+  month5: 'Месяц 5',
+  month6: 'Месяц 6'
+};
+
+const SPRINT_TITLES = {
+  month1: 'Базовые компоненты',
+  month2: 'Overlays',
+  month3: 'Navigation',
+  month4: 'Content',
+  month5: 'Финализация компонентов',
+  month6: 'Стабилизация'
+};
+
+const CHECKS = [
+  { key: 'figma_done', label: 'Компонент в Figma' },
+  { key: 'docs_done', label: 'Documentation (Anatomy, State)' },
+  { key: 'variants_done', label: 'Type / Style / Size' },
+  { key: 'tokens_done', label: 'Токены привязаны' }
+];
+
+function progress(c) {
+  const done = CHECKS.filter(ch => c[ch.key]).length;
+  return Math.round((done / CHECKS.length) * 100);
+}
+
+function statusOf(c) {
+  const p = progress(c);
+  if (p === 100) return 'done';
+  if (p === 0) return 'todo';
+  return 'wip';
+}
+
+const STATUS_COLORS = {
+  done: 'var(--text-success)',
+  wip: 'var(--text-warning)',
+  todo: 'var(--text-info)'
+};
+
+const STATUS_LABELS = {
+  done: 'Готов',
+  wip: 'В работе',
+  todo: 'Не начат'
+};
+
+function showError(msg) {
+  const b = document.getElementById('error-banner');
+  b.textContent = msg;
+  b.classList.add('show');
+  setTimeout(() => b.classList.remove('show'), 5000);
+}
+
+async function loadComponents() {
+  const { data, error } = await supa.from('components').select('*').order('created_at', { ascending: true });
+  if (error) {
+    showError('Ошибка загрузки: ' + error.message);
+    return [];
+  }
+  return data || [];
+}
+
+async function refresh() {
+  components = await loadComponents();
+  renderMetrics();
+  renderStatus(currentFilter);
+  renderPlan();
+}
+
+function renderMetrics() {
+  const total = components.length;
+  const totalChecks = total * CHECKS.length;
+  const doneChecks = components.reduce((sum, c) => sum + CHECKS.filter(ch => c[ch.key]).length, 0);
+  const overallProgress = totalChecks > 0 ? Math.round((doneChecks / totalChecks) * 100) : 0;
+
+  const doneCount = components.filter(c => statusOf(c) === 'done').length;
+  const wipCount = components.filter(c => statusOf(c) === 'wip').length;
+  const todoCount = components.filter(c => statusOf(c) === 'todo').length;
+
+  document.getElementById('total-progress').textContent = overallProgress + '%';
+  document.getElementById('total-progress-bar').style.width = overallProgress + '%';
+  document.getElementById('metric-done').textContent = doneCount;
+  document.getElementById('metric-total').textContent = 'из ' + total + ' разделов';
+  document.getElementById('metric-wip').textContent = wipCount;
+  document.getElementById('metric-todo').textContent = todoCount;
+}
+
+function renderStatus(filter) {
+  currentFilter = filter;
+  const container = document.getElementById('status-list-container');
+
+  let items = components.slice();
+  if (filter !== 'all') {
+    items = items.filter(c => statusOf(c) === filter);
+  }
+
+  if (items.length === 0) {
+    container.innerHTML = '<div class="empty">' + (components.length === 0 ? 'Пока нет разделов. ' + (isEditMode ? 'Добавь первый.' : '') : 'Нет разделов по этому фильтру.') + '</div>';
+    return;
+  }
+
+  const list = document.createElement('div');
+  list.className = 'list';
+
+  items.forEach(c => {
+    const p = progress(c);
+    const st = statusOf(c);
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.id = c.id;
+    item.innerHTML = `
+      <div class="item-row">
+        <div class="item-status" style="background: ${STATUS_COLORS[st]};"></div>
+        <div class="item-name">${escapeHtml(c.name)}</div>
+        <div class="item-progress">
+          <div class="item-progress-track"><div class="item-progress-fill" style="width: ${p}%;"></div></div>
+          <span class="item-progress-text">${p}%</span>
+        </div>
+        <span class="item-meta">${STATUS_LABELS[st]}</span>
+        <span class="item-toggle">›</span>
+      </div>
+      <div class="item-detail">${renderDetail(c)}</div>
+    `;
+    item.querySelector('.item-row').addEventListener('click', () => item.classList.toggle('open'));
+    bindDetailHandlers(item, c);
+    list.appendChild(item);
+  });
+
+  container.innerHTML = '';
+  container.appendChild(list);
+}
+
+function renderDetail(c) {
+  const checksHtml = CHECKS.map(ch => `
+    <div class="check-row">
+      <div class="check-box ${c[ch.key] ? 'done' : ''} ${isEditMode ? '' : 'readonly'}" data-id="${c.id}" data-key="${ch.key}">
+        ${c[ch.key] ? '<i class="ti ti-check" style="font-size:12px;" aria-hidden="true"></i>' : ''}
+      </div>
+      <div class="check-label ${c[ch.key] ? 'done' : ''}">${ch.label}</div>
+    </div>
+  `).join('');
+
+  const note = c.note || '—';
+  const days = c.days || 0;
+  const sprint = SPRINT_LABELS[c.sprint || ''] || 'Не назначен';
+
+  let html = `
+    <div class="checklist">${checksHtml}</div>
+    <div class="detail-field">
+      <div class="detail-field-label">Заметка</div>
+      <div class="detail-field-value">${escapeHtml(note)}</div>
+    </div>
+    <div class="detail-field">
+      <div class="detail-field-label">Дней на разработку</div>
+      <div class="detail-field-value">${days} ${days === 1 ? 'день' : 'дней'}</div>
+    </div>
+    <div class="detail-field">
+      <div class="detail-field-label">Спринт</div>
+      <div class="detail-field-value">${sprint}</div>
+    </div>
+  `;
+
+  if (isEditMode) {
+    html += `
+      <div class="detail-actions">
+        <button class="btn-secondary" data-action="edit" data-id="${c.id}">Редактировать</button>
+        <button class="btn-danger" data-action="delete" data-id="${c.id}">Удалить</button>
+      </div>
+    `;
+  }
+
+  return html;
+}
+
+function bindDetailHandlers(item, c) {
+  item.querySelectorAll('.check-box[data-key]').forEach(box => {
+    box.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!isEditMode) return;
+      const key = box.dataset.key;
+      const newVal = !c[key];
+      const { error } = await supa.from('components').update({ [key]: newVal }).eq('id', c.id);
+      if (error) {
+        showError('Ошибка сохранения: ' + error.message);
+        return;
+      }
+      c[key] = newVal;
+      await refresh();
+    });
+  });
+
+  item.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.action;
+      if (action === 'delete') deleteComponent(c.id);
+      if (action === 'edit') openEditModal(c);
+    });
+  });
+}
+
+async function deleteComponent(id) {
+  if (!confirm('Удалить раздел?')) return;
+  const { error } = await supa.from('components').delete().eq('id', id);
+  if (error) {
+    showError('Ошибка удаления: ' + error.message);
+    return;
+  }
+  await refresh();
+}
+
+function renderPlan() {
+  const container = document.getElementById('plan-list-container');
+  const monthKeys = ['month1', 'month2', 'month3', 'month4', 'month5', 'month6'];
+
+  let html = '';
+
+  monthKeys.forEach(mk => {
+    const monthComps = components.filter(c => c.sprint === mk);
+    const totalDays = monthComps.reduce((sum, c) => sum + (c.days || 0), 0);
+    const avgProgress = monthComps.length > 0
+      ? Math.round(monthComps.reduce((sum, c) => sum + progress(c), 0) / monthComps.length)
+      : 0;
+
+    html += `
+      <div class="month">
+        <div class="month-head" data-toggle="1">
+          <div class="month-title-row">
+            <div>
+              <div class="month-title">${SPRINT_LABELS[mk]} — ${SPRINT_TITLES[mk]}</div>
+              <div class="month-sub">${monthComps.length} ${monthComps.length === 1 ? 'раздел' : 'разделов'}</div>
+            </div>
+          </div>
+          <div class="month-stats">
+            <div class="month-progress">
+              <div class="item-progress-track"><div class="item-progress-fill" style="width: ${avgProgress}%;"></div></div>
+              <span class="item-progress-text">${avgProgress}%</span>
+            </div>
+            <span>${totalDays} д</span>
+          </div>
+        </div>
+        <div class="month-content">
+          ${monthComps.length === 0
+            ? '<div class="empty" style="padding: 20px 0;">Нет разделов в этом спринте</div>'
+            : monthComps.map(c => {
+                const p = progress(c);
+                const st = statusOf(c);
+                return `
+                  <div class="check-row" style="padding: 8px 0;">
+                    <div class="item-status" style="background: ${STATUS_COLORS[st]};"></div>
+                    <div class="check-label" style="flex: 1;">${escapeHtml(c.name)}</div>
+                    <div class="item-progress" style="min-width: 100px;">
+                      <div class="item-progress-track"><div class="item-progress-fill" style="width: ${p}%;"></div></div>
+                      <span class="item-progress-text">${p}%</span>
+                    </div>
+                    <span class="month-stats">${c.days || 0} д</span>
+                  </div>
+                `;
+              }).join('')
+          }
+        </div>
+      </div>
+    `;
+  });
+
+  const unassigned = components.filter(c => !c.sprint);
+  if (unassigned.length > 0) {
+    html += `
+      <div class="month">
+        <div class="month-head" data-toggle="1">
+          <div class="month-title-row">
+            <div>
+              <div class="month-title">Не назначены</div>
+              <div class="month-sub">${unassigned.length} ${unassigned.length === 1 ? 'раздел' : 'разделов'} без спринта</div>
+            </div>
+          </div>
+          <div class="month-stats">
+            <span>${unassigned.reduce((s, c) => s + (c.days || 0), 0)} д</span>
+          </div>
+        </div>
+        <div class="month-content">
+          ${unassigned.map(c => {
+            const p = progress(c);
+            const st = statusOf(c);
+            return `
+              <div class="check-row" style="padding: 8px 0;">
+                <div class="item-status" style="background: ${STATUS_COLORS[st]};"></div>
+                <div class="check-label" style="flex: 1;">${escapeHtml(c.name)}</div>
+                <div class="item-progress" style="min-width: 100px;">
+                  <div class="item-progress-track"><div class="item-progress-fill" style="width: ${p}%;"></div></div>
+                  <span class="item-progress-text">${p}%</span>
+                </div>
+                <span class="month-stats">${c.days || 0} д</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+  container.querySelectorAll('.month-head').forEach(h => {
+    h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+  });
+}
+
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Добавить раздел';
+  document.getElementById('modal-sub').textContent = 'Заполни данные о новом компоненте дизайн-системы';
+  document.getElementById('form-name').value = '';
+  document.getElementById('form-days').value = 0;
+  document.getElementById('form-sprint').value = '';
+  document.getElementById('form-note').value = '';
+  formState = { figma_done: false, docs_done: false, variants_done: false, tokens_done: false };
+  renderModalChecks();
+  document.getElementById('add-modal').classList.add('active');
+}
+
+function openEditModal(c) {
+  editingId = c.id;
+  document.getElementById('modal-title').textContent = 'Редактировать раздел';
+  document.getElementById('modal-sub').textContent = c.name;
+  document.getElementById('form-name').value = c.name || '';
+  document.getElementById('form-days').value = c.days || 0;
+  document.getElementById('form-sprint').value = c.sprint || '';
+  document.getElementById('form-note').value = c.note || '';
+  formState = {
+    figma_done: !!c.figma_done,
+    docs_done: !!c.docs_done,
+    variants_done: !!c.variants_done,
+    tokens_done: !!c.tokens_done
+  };
+  renderModalChecks();
+  document.getElementById('add-modal').classList.add('active');
+}
+
+function renderModalChecks() {
+  document.querySelectorAll('#modal-checks .check-box').forEach(box => {
+    const key = box.dataset.check;
+    if (formState[key]) {
+      box.classList.add('done');
+      box.innerHTML = '<i class="ti ti-check" style="font-size:12px;" aria-hidden="true"></i>';
+    } else {
+      box.classList.remove('done');
+      box.innerHTML = '';
+    }
+  });
+}
+
+function closeModal() {
+  document.getElementById('add-modal').classList.remove('active');
+}
+
+async function saveComponent() {
+  const name = document.getElementById('form-name').value.trim();
+  if (!name) {
+    showError('Введи название раздела');
+    return;
+  }
+  const days = parseInt(document.getElementById('form-days').value, 10) || 0;
+  const sprint = document.getElementById('form-sprint').value;
+  const note = document.getElementById('form-note').value.trim();
+
+  const payload = {
+    name,
+    days,
+    sprint,
+    note,
+    ...formState
+  };
+
+  let error;
+  if (editingId) {
+    const r = await supa.from('components').update(payload).eq('id', editingId);
+    error = r.error;
+  } else {
+    const r = await supa.from('components').insert(payload);
+    error = r.error;
+  }
+
+  if (error) {
+    showError('Ошибка сохранения: ' + error.message);
+    return;
+  }
+  closeModal();
+  await refresh();
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const view = tab.dataset.view;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === view));
+  });
+});
+
+document.querySelectorAll('.filter').forEach(f => {
+  f.addEventListener('click', () => {
+    document.querySelectorAll('.filter').forEach(x => x.classList.toggle('active', x === f));
+    renderStatus(f.dataset.filter);
+  });
+});
+
+document.getElementById('add-btn').addEventListener('click', openAddModal);
+document.getElementById('modal-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-save').addEventListener('click', saveComponent);
+document.getElementById('add-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'add-modal') closeModal();
+});
+
+document.querySelectorAll('#modal-checks .check-box').forEach(box => {
+  box.addEventListener('click', () => {
+    const key = box.dataset.check;
+    formState[key] = !formState[key];
+    renderModalChecks();
+  });
+});
+
+if (isEditMode) {
+  document.getElementById('edit-badge').style.display = 'inline-flex';
+  document.getElementById('add-btn').style.display = 'inline-flex';
+}
+
+refresh();
+</script>
+
+</body>
+</html>
