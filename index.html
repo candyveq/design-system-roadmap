@@ -772,8 +772,157 @@ body {
   top: 28px;
 }
 
+.plan-comp-row:hover {
+  background: var(--bg-tertiary);
+}
+
 .tm-drag-handle:active { cursor: grabbing; }
 .edit-mode .tm-drag-handle { display: inline-flex; }
+
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  z-index: 200;
+}
+
+.sheet-overlay.active { display: block; }
+
+.sheet {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border-tertiary);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 720px;
+  margin: 0 auto;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  z-index: 201;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  display: none;
+}
+
+.sheet.active {
+  display: block;
+  transform: translateY(0);
+}
+
+.sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.sheet-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sheet-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.sheet-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.sheet-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border-tertiary);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.sheet-close:hover {
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+}
+
+.sheet-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 20px;
+}
+
+.sheet-progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sheet-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.sheet-progress-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 36px;
+  text-align: right;
+}
+
+.sheet-section {
+  margin: 0 0 20px;
+}
+
+.sheet-section-title {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 10px;
+  font-weight: 500;
+}
+
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0 0;
+  padding: 16px 0 0;
+  border-top: 0.5px solid var(--border-tertiary);
+}
+
+@media (max-width: 640px) {
+  .sheet { left: 8px; right: 8px; bottom: 8px; padding: 20px; }
+}
 </style>
 </head>
 <body>
@@ -782,8 +931,8 @@ body {
 
   <div class="header">
     <div class="header-text">
-      <h1>Design System</h1>
-      <p>Roadmap — план развития</p>
+      <h1>Design System Roadmap</h1>
+      <p>BetBoom — план развития на 6 месяцев</p>
     </div>
     <div id="edit-badge" class="edit-badge" style="display: none;">
       <i class="ti ti-pencil" aria-hidden="true" style="font-size: 12px;"></i>
@@ -970,6 +1119,56 @@ body {
       <button class="btn-secondary" id="modal-cancel">Отмена</button>
       <button class="btn-primary" id="modal-save">Сохранить</button>
     </div>
+  </div>
+</div>
+
+<div id="comp-sheet-overlay" class="sheet-overlay"></div>
+<div id="comp-sheet" class="sheet">
+  <div class="sheet-header">
+    <div class="sheet-title-row">
+      <div class="sheet-status-dot" id="sheet-dot"></div>
+      <div style="flex: 1; min-width: 0;">
+        <div class="sheet-title" id="sheet-title">—</div>
+        <div class="sheet-sub" id="sheet-sub">—</div>
+      </div>
+    </div>
+    <button class="sheet-close" id="sheet-close" aria-label="Закрыть"><i class="ti ti-x"></i></button>
+  </div>
+
+  <div class="sheet-progress">
+    <div class="sheet-progress-track"><div class="sheet-progress-fill" id="sheet-progress-fill" style="width: 0%;"></div></div>
+    <span class="sheet-progress-text" id="sheet-progress-text">0%</span>
+  </div>
+
+  <div class="sheet-section">
+    <div class="sheet-section-title">Готовность</div>
+    <div class="checklist" id="sheet-checks"></div>
+  </div>
+
+  <div class="sheet-section" id="sheet-link-section" style="display: none;">
+    <div class="sheet-section-title">Ссылка на компонент</div>
+    <div class="detail-field-value"><a id="sheet-link" href="#" target="_blank" rel="noopener" style="color: var(--text-info); text-decoration: none;"></a></div>
+  </div>
+
+  <div class="sheet-section">
+    <div class="sheet-section-title">Заметка</div>
+    <div class="detail-field-value" id="sheet-note">—</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div class="sheet-section">
+      <div class="sheet-section-title">Дней на разработку</div>
+      <div class="detail-field-value" id="sheet-days">0</div>
+    </div>
+    <div class="sheet-section">
+      <div class="sheet-section-title">Спринт</div>
+      <div class="detail-field-value" id="sheet-sprint">Не назначен</div>
+    </div>
+  </div>
+
+  <div class="sheet-actions" id="sheet-actions" style="display: none;">
+    <button class="btn-secondary" id="sheet-edit-btn">Редактировать</button>
+    <button class="btn-danger" id="sheet-delete-btn">Удалить</button>
   </div>
 </div>
 
@@ -1310,7 +1509,7 @@ function renderPlan() {
                 const p = progress(c);
                 const st = statusOf(c);
                 return `
-                  <div class="check-row" style="padding: 8px 0;">
+                  <div class="check-row plan-comp-row" data-comp-id="${c.id}" style="padding: 8px 0; cursor: pointer; border-radius: 6px; padding-left: 8px; padding-right: 8px; margin-left: -8px; margin-right: -8px;">
                     <div class="item-status" style="background: ${STATUS_COLORS[st]};"></div>
                     <div class="check-label" style="flex: 1;">${escapeHtml(c.name)}</div>
                     <div class="item-progress" style="min-width: 100px;">
@@ -1347,7 +1546,7 @@ function renderPlan() {
             const p = progress(c);
             const st = statusOf(c);
             return `
-              <div class="check-row" style="padding: 8px 0;">
+              <div class="check-row plan-comp-row" data-comp-id="${c.id}" style="padding: 8px 0; cursor: pointer; border-radius: 6px; padding-left: 8px; padding-right: 8px; margin-left: -8px; margin-right: -8px;">
                 <div class="item-status" style="background: ${STATUS_COLORS[st]};"></div>
                 <div class="check-label" style="flex: 1;">${escapeHtml(c.name)}</div>
                 <div class="item-progress" style="min-width: 100px;">
@@ -1374,6 +1573,16 @@ function renderPlan() {
     h.addEventListener('click', (e) => {
       if (e.target.closest('.month-actions') || e.target.closest('.month-drag-handle')) return;
       h.parentElement.classList.toggle('open');
+    });
+  });
+
+  // Click on component row to open bottom sheet
+  container.querySelectorAll('.plan-comp-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const compId = row.dataset.compId;
+      const comp = components.find(c => c.id === compId);
+      if (comp) openComponentSheet(comp);
     });
   });
 
@@ -1859,6 +2068,106 @@ if (isEditMode) {
   document.getElementById('add-stage-btn').style.display = 'inline-flex';
   document.getElementById('add-stage-btn').addEventListener('click', openStageAddModal);
 }
+
+let activeSheetCompId = null;
+
+function openComponentSheet(c) {
+  activeSheetCompId = c.id;
+  const p = progress(c);
+  const st = statusOf(c);
+
+  document.getElementById('sheet-dot').style.background = STATUS_COLORS[st];
+  document.getElementById('sheet-title').textContent = c.name;
+  document.getElementById('sheet-sub').textContent = STATUS_LABELS[st];
+  document.getElementById('sheet-progress-fill').style.width = p + '%';
+  document.getElementById('sheet-progress-text').textContent = p + '%';
+
+  // Render checklist
+  const checksContainer = document.getElementById('sheet-checks');
+  checksContainer.innerHTML = CHECKS.map(ch => `
+    <div class="check-row">
+      <div class="check-box ${c[ch.key] ? 'done' : ''} ${isEditMode ? '' : 'readonly'}" data-key="${ch.key}">
+        ${c[ch.key] ? '<i class="ti ti-check" style="font-size:12px;" aria-hidden="true"></i>' : ''}
+      </div>
+      <div class="check-label ${c[ch.key] ? 'done' : ''}">${ch.label}</div>
+    </div>
+  `).join('');
+
+  // Bind checkbox clicks if in edit mode
+  if (isEditMode) {
+    checksContainer.querySelectorAll('.check-box').forEach(box => {
+      box.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const key = box.dataset.key;
+        const newVal = !c[key];
+        const { error } = await supa.from('components').update({ [key]: newVal }).eq('id', c.id);
+        if (error) {
+          showError('Ошибка сохранения: ' + error.message);
+          return;
+        }
+        c[key] = newVal;
+        await refresh();
+        const updated = components.find(x => x.id === c.id);
+        if (updated) openComponentSheet(updated);
+      });
+    });
+  }
+
+  // Link
+  const linkSection = document.getElementById('sheet-link-section');
+  const linkEl = document.getElementById('sheet-link');
+  if (c.figma_link) {
+    linkSection.style.display = 'block';
+    linkEl.href = c.figma_link;
+    linkEl.textContent = c.figma_link;
+  } else {
+    linkSection.style.display = 'none';
+  }
+
+  // Note
+  document.getElementById('sheet-note').textContent = c.note || '—';
+
+  // Days & sprint
+  const days = c.days || 0;
+  document.getElementById('sheet-days').textContent = days + ' ' + (days === 1 ? 'день' : 'дней');
+  document.getElementById('sheet-sprint').textContent = sprintNameById(c.sprint);
+
+  // Edit/delete buttons
+  const actions = document.getElementById('sheet-actions');
+  if (isEditMode) {
+    actions.style.display = 'flex';
+  } else {
+    actions.style.display = 'none';
+  }
+
+  document.getElementById('comp-sheet-overlay').classList.add('active');
+  document.getElementById('comp-sheet').classList.add('active');
+}
+
+function closeComponentSheet() {
+  activeSheetCompId = null;
+  document.getElementById('comp-sheet-overlay').classList.remove('active');
+  document.getElementById('comp-sheet').classList.remove('active');
+}
+
+document.getElementById('sheet-close').addEventListener('click', closeComponentSheet);
+document.getElementById('comp-sheet-overlay').addEventListener('click', closeComponentSheet);
+
+document.getElementById('sheet-edit-btn').addEventListener('click', () => {
+  if (!activeSheetCompId) return;
+  const comp = components.find(c => c.id === activeSheetCompId);
+  if (comp) {
+    closeComponentSheet();
+    openEditModal(comp);
+  }
+});
+
+document.getElementById('sheet-delete-btn').addEventListener('click', async () => {
+  if (!activeSheetCompId) return;
+  const id = activeSheetCompId;
+  closeComponentSheet();
+  await deleteComponent(id);
+});
 
 document.getElementById('stage-modal-cancel').addEventListener('click', closeStageModal);
 document.getElementById('stage-modal-save').addEventListener('click', saveStage);
