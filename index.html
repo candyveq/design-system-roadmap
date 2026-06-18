@@ -725,6 +725,11 @@ body {
     </div>
 
     <div class="form-row">
+      <label class="form-label">Ссылка на компонент</label>
+      <input type="url" class="input" id="form-link" placeholder="https://figma.com/...">
+    </div>
+
+    <div class="form-row">
       <label class="form-label">Заметка</label>
       <textarea class="textarea" id="form-note" placeholder="Опционально"></textarea>
     </div>
@@ -751,6 +756,7 @@ let components = [];
 let currentFilter = 'all';
 let editingId = null;
 let formState = { figma_done: false, docs_done: false, variants_done: false, tokens_done: false };
+let formLink = '';
 
 const SPRINT_LABELS = {
   '': 'Не назначен',
@@ -899,11 +905,18 @@ function renderDetail(c) {
   `).join('');
 
   const note = c.note || '—';
+  const link = c.figma_link || '';
   const days = c.days || 0;
   const sprint = SPRINT_LABELS[c.sprint || ''] || 'Не назначен';
 
   let html = `
     <div class="checklist">${checksHtml}</div>
+    ${link ? `
+    <div class="detail-field">
+      <div class="detail-field-label">Ссылка на компонент</div>
+      <div class="detail-field-value"><a href="${escapeHtml(link)}" target="_blank" rel="noopener" style="color: var(--text-info); text-decoration: none;">${escapeHtml(link)}</a></div>
+    </div>
+    ` : ''}
     <div class="detail-field">
       <div class="detail-field-label">Заметка</div>
       <div class="detail-field-value">${escapeHtml(note)}</div>
@@ -1070,6 +1083,7 @@ function openAddModal() {
   document.getElementById('form-name').value = '';
   document.getElementById('form-days').value = 0;
   document.getElementById('form-sprint').value = '';
+  document.getElementById('form-link').value = '';
   document.getElementById('form-note').value = '';
   formState = { figma_done: false, docs_done: false, variants_done: false, tokens_done: false };
   renderModalChecks();
@@ -1083,6 +1097,7 @@ function openEditModal(c) {
   document.getElementById('form-name').value = c.name || '';
   document.getElementById('form-days').value = c.days || 0;
   document.getElementById('form-sprint').value = c.sprint || '';
+  document.getElementById('form-link').value = c.figma_link || '';
   document.getElementById('form-note').value = c.note || '';
   formState = {
     figma_done: !!c.figma_done,
@@ -1119,12 +1134,14 @@ async function saveComponent() {
   }
   const days = parseInt(document.getElementById('form-days').value, 10) || 0;
   const sprint = document.getElementById('form-sprint').value;
+  const link = document.getElementById('form-link').value.trim();
   const note = document.getElementById('form-note').value.trim();
 
   const payload = {
     name,
     days,
     sprint,
+    figma_link: link,
     note,
     ...formState
   };
