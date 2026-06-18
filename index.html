@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Design System — BetBoom</title>
+<title>Design System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -555,6 +555,94 @@ body {
   .month-progress { min-width: 80px; }
   .form-grid-2 { grid-template-columns: 1fr; }
 }
+
+.sprint-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 16px;
+}
+
+.month {
+  position: relative;
+}
+
+.month.dragging {
+  opacity: 0.4;
+}
+
+.month.drag-over {
+  border-color: var(--accent);
+}
+
+.month-drag-handle {
+  display: none;
+  cursor: grab;
+  color: var(--text-tertiary);
+  padding: 4px;
+  margin-right: 4px;
+  font-size: 16px;
+  user-select: none;
+}
+
+.month-drag-handle:active {
+  cursor: grabbing;
+}
+
+.edit-mode .month-drag-handle {
+  display: inline-flex;
+}
+
+.month-name-input {
+  background: var(--bg-tertiary);
+  border: 0.5px solid var(--border-secondary);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  max-width: 400px;
+}
+
+.month-name-input:focus {
+  border-color: var(--accent);
+}
+
+.month-actions {
+  display: none;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.edit-mode .month-actions {
+  display: inline-flex;
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 0.5px solid var(--border-tertiary);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.icon-btn:hover {
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+}
+
+.icon-btn.danger:hover {
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
 </style>
 </head>
 <body>
@@ -563,8 +651,8 @@ body {
 
   <div class="header">
     <div class="header-text">
-      <h1>Design System Roadmap</h1>
-      <p>BetBoom — план развития на 6 месяцев</p>
+      <h1>Design System</h1>
+      <p>Roadmap — план развития</p>
     </div>
     <div id="edit-badge" class="edit-badge" style="display: none;">
       <i class="ti ti-pencil" aria-hidden="true" style="font-size: 12px;"></i>
@@ -631,6 +719,12 @@ body {
   </div>
 
   <div class="view" data-view="plan">
+    <div class="sprint-toolbar">
+      <button id="add-sprint-btn" class="btn-primary" style="display: none;">
+        <i class="ti ti-plus" aria-hidden="true" style="font-size: 14px;"></i>
+        Добавить спринт
+      </button>
+    </div>
     <div id="plan-list-container">
       <div class="loading">Загрузка данных...</div>
     </div>
@@ -714,12 +808,6 @@ body {
         <label class="form-label">Спринт</label>
         <select class="select" id="form-sprint">
           <option value="">Не назначен</option>
-          <option value="month1">Месяц 1</option>
-          <option value="month2">Месяц 2</option>
-          <option value="month3">Месяц 3</option>
-          <option value="month4">Месяц 4</option>
-          <option value="month5">Месяц 5</option>
-          <option value="month6">Месяц 6</option>
         </select>
       </div>
     </div>
@@ -753,29 +841,16 @@ const isEditMode = params.get('edit') === EDIT_KEY;
 const supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let components = [];
+let sprints = [];
 let currentFilter = 'all';
 let editingId = null;
 let formState = { figma_done: false, docs_done: false, variants_done: false, tokens_done: false };
 let formLink = '';
 
-const SPRINT_LABELS = {
-  '': 'Не назначен',
-  month1: 'Месяц 1',
-  month2: 'Месяц 2',
-  month3: 'Месяц 3',
-  month4: 'Месяц 4',
-  month5: 'Месяц 5',
-  month6: 'Месяц 6'
-};
-
-const SPRINT_TITLES = {
-  month1: 'Базовые компоненты',
-  month2: 'Overlays',
-  month3: 'Navigation',
-  month4: 'Content',
-  month5: 'Финализация компонентов',
-  month6: 'Стабилизация'
-};
+function sprintNameById(id) {
+  const s = sprints.find(x => x.id === id);
+  return s ? s.name : 'Не назначен';
+}
 
 const CHECKS = [
   { key: 'figma_done', label: 'Компонент в Figma' },
@@ -818,17 +893,27 @@ function showError(msg) {
 async function loadComponents() {
   const { data, error } = await supa.from('components').select('*').order('created_at', { ascending: true });
   if (error) {
-    showError('Ошибка загрузки: ' + error.message);
+    showError('Ошибка загрузки разделов: ' + error.message);
+    return [];
+  }
+  return data || [];
+}
+
+async function loadSprints() {
+  const { data, error } = await supa.from('sprints').select('*').order('position', { ascending: true });
+  if (error) {
+    showError('Ошибка загрузки спринтов: ' + error.message);
     return [];
   }
   return data || [];
 }
 
 async function refresh() {
-  components = await loadComponents();
+  [components, sprints] = await Promise.all([loadComponents(), loadSprints()]);
   renderMetrics();
   renderStatus(currentFilter);
   renderPlan();
+  renderSprintOptionsInModal();
 }
 
 function renderMetrics() {
@@ -907,7 +992,7 @@ function renderDetail(c) {
   const note = c.note || '—';
   const link = c.figma_link || '';
   const days = c.days || 0;
-  const sprint = SPRINT_LABELS[c.sprint || ''] || 'Не назначен';
+  const sprint = sprintNameById(c.sprint);
 
   let html = `
     <div class="checklist">${checksHtml}</div>
@@ -982,24 +1067,33 @@ async function deleteComponent(id) {
 
 function renderPlan() {
   const container = document.getElementById('plan-list-container');
-  const monthKeys = ['month1', 'month2', 'month3', 'month4', 'month5', 'month6'];
+  container.classList.toggle('edit-mode', isEditMode);
 
   let html = '';
 
-  monthKeys.forEach(mk => {
-    const monthComps = components.filter(c => c.sprint === mk);
+  sprints.forEach((sprint, idx) => {
+    const monthComps = components.filter(c => c.sprint === sprint.id);
     const totalDays = monthComps.reduce((sum, c) => sum + (c.days || 0), 0);
     const avgProgress = monthComps.length > 0
       ? Math.round(monthComps.reduce((sum, c) => sum + progress(c), 0) / monthComps.length)
       : 0;
 
     html += `
-      <div class="month">
-        <div class="month-head" data-toggle="1">
+      <div class="month" data-sprint-id="${sprint.id}" ${isEditMode ? 'draggable="true"' : ''}>
+        <div class="month-head">
           <div class="month-title-row">
-            <div>
-              <div class="month-title">${SPRINT_LABELS[mk]} — ${SPRINT_TITLES[mk]}</div>
+            <span class="month-drag-handle" aria-label="Переместить"><i class="ti ti-grip-vertical"></i></span>
+            <div style="flex: 1;">
+              <div class="month-title" data-display="name">${escapeHtml(sprint.name)}</div>
               <div class="month-sub">${monthComps.length} ${monthComps.length === 1 ? 'раздел' : 'разделов'}</div>
+            </div>
+            <div class="month-actions">
+              <button class="icon-btn" data-action="rename" data-id="${sprint.id}" title="Переименовать">
+                <i class="ti ti-pencil"></i>
+              </button>
+              <button class="icon-btn danger" data-action="delete-sprint" data-id="${sprint.id}" title="Удалить спринт">
+                <i class="ti ti-trash"></i>
+              </button>
             </div>
           </div>
           <div class="month-stats">
@@ -1037,10 +1131,10 @@ function renderPlan() {
   const unassigned = components.filter(c => !c.sprint);
   if (unassigned.length > 0) {
     html += `
-      <div class="month">
-        <div class="month-head" data-toggle="1">
+      <div class="month" data-sprint-id="">
+        <div class="month-head">
           <div class="month-title-row">
-            <div>
+            <div style="flex: 1;">
               <div class="month-title">Не назначены</div>
               <div class="month-sub">${unassigned.length} ${unassigned.length === 1 ? 'раздел' : 'разделов'} без спринта</div>
             </div>
@@ -1070,16 +1164,169 @@ function renderPlan() {
     `;
   }
 
+  if (sprints.length === 0 && unassigned.length === 0) {
+    html = '<div class="empty">Пока нет спринтов. ' + (isEditMode ? 'Добавь первый.' : '') + '</div>';
+  }
+
   container.innerHTML = html;
+
+  // Click on month head to toggle (but not on actions/handle)
   container.querySelectorAll('.month-head').forEach(h => {
-    h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+    h.addEventListener('click', (e) => {
+      if (e.target.closest('.month-actions') || e.target.closest('.month-drag-handle')) return;
+      h.parentElement.classList.toggle('open');
+    });
   });
+
+  // Rename
+  container.querySelectorAll('[data-action="rename"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      startRename(btn.dataset.id);
+    });
+  });
+
+  // Delete sprint
+  container.querySelectorAll('[data-action="delete-sprint"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteSprint(btn.dataset.id);
+    });
+  });
+
+  if (isEditMode) setupDragAndDrop(container);
+}
+
+function startRename(sprintId) {
+  const monthEl = document.querySelector(`.month[data-sprint-id="${sprintId}"]`);
+  if (!monthEl) return;
+  const titleEl = monthEl.querySelector('[data-display="name"]');
+  const currentName = titleEl.textContent;
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'month-name-input';
+  input.value = currentName;
+  titleEl.replaceWith(input);
+  input.focus();
+  input.select();
+
+  const finish = async (save) => {
+    if (save) {
+      const newName = input.value.trim();
+      if (newName && newName !== currentName) {
+        const { error } = await supa.from('sprints').update({ name: newName }).eq('id', sprintId);
+        if (error) {
+          showError('Ошибка переименования: ' + error.message);
+          await refresh();
+          return;
+        }
+      }
+    }
+    await refresh();
+  };
+
+  input.addEventListener('blur', () => finish(true));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+  });
+}
+
+async function deleteSprint(sprintId) {
+  const sprint = sprints.find(s => s.id === sprintId);
+  if (!sprint) return;
+  const assigned = components.filter(c => c.sprint === sprintId).length;
+  const msg = assigned > 0
+    ? `Удалить «${sprint.name}»? ${assigned} ${assigned === 1 ? 'раздел' : 'разделов'} перейдёт в "Не назначены".`
+    : `Удалить «${sprint.name}»?`;
+  if (!confirm(msg)) return;
+
+  if (assigned > 0) {
+    const { error: e1 } = await supa.from('components').update({ sprint: '' }).eq('sprint', sprintId);
+    if (e1) { showError('Ошибка отвязки разделов: ' + e1.message); return; }
+  }
+  const { error } = await supa.from('sprints').delete().eq('id', sprintId);
+  if (error) { showError('Ошибка удаления: ' + error.message); return; }
+  await refresh();
+}
+
+async function addSprint() {
+  const name = prompt('Название спринта:');
+  if (!name || !name.trim()) return;
+  const maxPos = sprints.length > 0 ? Math.max(...sprints.map(s => s.position || 0)) : 0;
+  const { error } = await supa.from('sprints').insert({ name: name.trim(), position: maxPos + 1 });
+  if (error) { showError('Ошибка добавления: ' + error.message); return; }
+  await refresh();
+}
+
+let dragSrcEl = null;
+
+function setupDragAndDrop(container) {
+  const monthEls = container.querySelectorAll('.month[draggable="true"]');
+  monthEls.forEach(el => {
+    el.addEventListener('dragstart', (e) => {
+      dragSrcEl = el;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      container.querySelectorAll('.month').forEach(m => m.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    el.addEventListener('dragenter', (e) => {
+      if (el !== dragSrcEl) el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', () => {
+      el.classList.remove('drag-over');
+    });
+    el.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      el.classList.remove('drag-over');
+      if (!dragSrcEl || dragSrcEl === el) return;
+      const srcId = dragSrcEl.dataset.sprintId;
+      const destId = el.dataset.sprintId;
+      if (!srcId || !destId) return;
+
+      const newOrder = [];
+      container.querySelectorAll('.month[draggable="true"]').forEach(m => {
+        if (m === dragSrcEl) return;
+        newOrder.push(m.dataset.sprintId);
+      });
+      const destIndex = newOrder.indexOf(destId);
+      newOrder.splice(destIndex, 0, srcId);
+
+      const updates = newOrder.map((id, i) => supa.from('sprints').update({ position: i + 1 }).eq('id', id));
+      const results = await Promise.all(updates);
+      const failed = results.find(r => r.error);
+      if (failed) { showError('Ошибка сохранения порядка: ' + failed.error.message); }
+      await refresh();
+    });
+  });
+}
+
+function renderSprintOptionsInModal() {
+  const select = document.getElementById('form-sprint');
+  if (!select) return;
+  const current = select.value;
+  let html = '<option value="">Не назначен</option>';
+  sprints.forEach(s => {
+    html += `<option value="${s.id}">${escapeHtml(s.name)}</option>`;
+  });
+  select.innerHTML = html;
+  if (current) select.value = current;
 }
 
 function openAddModal() {
   editingId = null;
   document.getElementById('modal-title').textContent = 'Добавить раздел';
   document.getElementById('modal-sub').textContent = 'Заполни данные о новом компоненте дизайн-системы';
+  renderSprintOptionsInModal();
   document.getElementById('form-name').value = '';
   document.getElementById('form-days').value = 0;
   document.getElementById('form-sprint').value = '';
@@ -1094,6 +1341,7 @@ function openEditModal(c) {
   editingId = c.id;
   document.getElementById('modal-title').textContent = 'Редактировать раздел';
   document.getElementById('modal-sub').textContent = c.name;
+  renderSprintOptionsInModal();
   document.getElementById('form-name').value = c.name || '';
   document.getElementById('form-days').value = c.days || 0;
   document.getElementById('form-sprint').value = c.sprint || '';
@@ -1206,6 +1454,8 @@ document.querySelectorAll('#modal-checks .check-box').forEach(box => {
 if (isEditMode) {
   document.getElementById('edit-badge').style.display = 'inline-flex';
   document.getElementById('add-btn').style.display = 'inline-flex';
+  document.getElementById('add-sprint-btn').style.display = 'inline-flex';
+  document.getElementById('add-sprint-btn').addEventListener('click', addSprint);
 }
 
 refresh();
