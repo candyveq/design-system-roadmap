@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Design System</title>
+<title>Design System Roadmap — BetBoom</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -643,6 +643,137 @@ body {
   color: #EF4444;
   border-color: rgba(239, 68, 68, 0.3);
 }
+
+.tm-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0;
+  align-items: stretch;
+  min-height: 180px;
+  position: relative;
+}
+
+.tm-row + .tm-row .tm-card {
+  border-top: 0.5px solid var(--border-tertiary);
+}
+
+.tm-rail {
+  position: relative;
+  padding: 28px 0 0;
+}
+
+.tm-tick-active {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tm-tick-line {
+  width: 32px;
+  height: 1.5px;
+  background: var(--text-primary);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.tm-tick-label { display: flex; flex-direction: column; }
+
+.tm-tick-stage {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.tm-tick-name {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.tm-dimmed .tm-tick-line {
+  background: var(--border-tertiary);
+  width: 18px;
+}
+
+.tm-dimmed .tm-tick-stage { color: var(--text-tertiary); }
+
+.tm-card {
+  padding: 24px 0 24px 24px;
+  border-left: 0.5px solid var(--border-tertiary);
+  position: relative;
+}
+
+.tm-card.editable { padding-right: 80px; }
+
+.tm-card-actions {
+  position: absolute;
+  top: 20px;
+  right: 0;
+  display: none;
+  gap: 6px;
+}
+
+.edit-mode .tm-card.editable .tm-card-actions { display: inline-flex; }
+
+.tm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin: 0 0 12px;
+  font-weight: 500;
+}
+
+.tm-badge.done { background: rgba(34, 197, 94, 0.12); color: var(--text-success); }
+.tm-badge.now { background: rgba(111, 168, 232, 0.16); color: var(--text-info); }
+.tm-badge.parallel { background: rgba(111, 168, 232, 0.16); color: var(--text-info); }
+.tm-badge.todo { background: var(--bg-tertiary); color: var(--text-secondary); }
+
+.tm-card h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 10px;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.tm-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 14px;
+  line-height: 1.7;
+}
+
+.tm-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.tm-meta i { font-size: 14px; }
+
+.tm-row.dragging { opacity: 0.4; }
+.tm-row.drag-over .tm-card { border-color: var(--accent); }
+
+.tm-drag-handle {
+  display: none;
+  cursor: grab;
+  color: var(--text-tertiary);
+  padding: 4px;
+  font-size: 14px;
+  user-select: none;
+  position: absolute;
+  left: 0;
+  top: 28px;
+}
+
+.tm-drag-handle:active { cursor: grabbing; }
+.edit-mode .tm-drag-handle { display: inline-flex; }
 </style>
 </head>
 <body>
@@ -651,8 +782,8 @@ body {
 
   <div class="header">
     <div class="header-text">
-      <h1>Design System</h1>
-      <p>Roadmap — план развития</p>
+      <h1>Design System Roadmap</h1>
+      <p>BetBoom — план развития на 6 месяцев</p>
     </div>
     <div id="edit-badge" class="edit-badge" style="display: none;">
       <i class="ti ti-pencil" aria-hidden="true" style="font-size: 12px;"></i>
@@ -692,6 +823,7 @@ body {
   <div class="tabs">
     <button class="tab active" data-view="status">Текущий статус</button>
     <button class="tab" data-view="plan">План на 6 месяцев</button>
+    <button class="tab" data-view="timeline">Timeline</button>
     <button class="tab" data-view="risks">Риски</button>
   </div>
 
@@ -726,6 +858,18 @@ body {
       </button>
     </div>
     <div id="plan-list-container">
+      <div class="loading">Загрузка данных...</div>
+    </div>
+  </div>
+
+  <div class="view" data-view="timeline">
+    <div class="sprint-toolbar">
+      <button id="add-stage-btn" class="btn-primary" style="display: none;">
+        <i class="ti ti-plus" aria-hidden="true" style="font-size: 14px;"></i>
+        Добавить этап
+      </button>
+    </div>
+    <div id="timeline-container">
       <div class="loading">Загрузка данных...</div>
     </div>
   </div>
@@ -829,6 +973,49 @@ body {
   </div>
 </div>
 
+<div id="stage-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="stage-modal-title">Добавить этап</div>
+    <p class="modal-sub" id="stage-modal-sub">Заполни данные о новом этапе развития системы</p>
+
+    <div class="form-row">
+      <label class="form-label">Название</label>
+      <input type="text" class="input" id="stage-form-name" placeholder="Например: Full Component Library">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Короткое название (для шкалы)</label>
+      <input type="text" class="input" id="stage-form-short" placeholder="Например: Full Library">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Описание</label>
+      <textarea class="textarea" id="stage-form-desc" placeholder="Что включает этап"></textarea>
+    </div>
+
+    <div class="form-grid-2">
+      <div class="form-row">
+        <label class="form-label">Статус</label>
+        <select class="select" id="stage-form-status">
+          <option value="todo">Запланировано</option>
+          <option value="now">Сейчас</option>
+          <option value="parallel">Параллельно</option>
+          <option value="done">Готов</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Метка времени</label>
+        <input type="text" class="input" id="stage-form-meta" placeholder="Например: Месяц 6">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" id="stage-modal-cancel">Отмена</button>
+      <button class="btn-primary" id="stage-modal-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://oknrvwkytfwfmftzoeiy.supabase.co';
@@ -842,8 +1029,10 @@ const supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let components = [];
 let sprints = [];
+let stages = [];
 let currentFilter = 'all';
 let editingId = null;
+let editingStageId = null;
 let formState = { figma_done: false, docs_done: false, variants_done: false, tokens_done: false };
 let formLink = '';
 
@@ -908,11 +1097,21 @@ async function loadSprints() {
   return data || [];
 }
 
+async function loadStages() {
+  const { data, error } = await supa.from('stages').select('*').order('position', { ascending: true });
+  if (error) {
+    showError('Ошибка загрузки этапов: ' + error.message);
+    return [];
+  }
+  return data || [];
+}
+
 async function refresh() {
-  [components, sprints] = await Promise.all([loadComponents(), loadSprints()]);
+  [components, sprints, stages] = await Promise.all([loadComponents(), loadSprints(), loadStages()]);
   renderMetrics();
   renderStatus(currentFilter);
   renderPlan();
+  renderTimeline();
   renderSprintOptionsInModal();
 }
 
@@ -1310,6 +1509,207 @@ function setupDragAndDrop(container) {
   });
 }
 
+const STAGE_BADGE = {
+  done: { class: 'done', icon: 'ti-check', label: 'Готов' },
+  now: { class: 'now', icon: 'ti-player-play', label: 'Сейчас' },
+  parallel: { class: 'parallel', icon: 'ti-sun', label: 'Параллельно' },
+  todo: { class: 'todo', icon: '', label: 'Запланировано' }
+};
+
+function renderTimeline() {
+  const container = document.getElementById('timeline-container');
+  container.classList.toggle('edit-mode', isEditMode);
+
+  if (stages.length === 0) {
+    container.innerHTML = '<div class="empty">Пока нет этапов. ' + (isEditMode ? 'Добавь первый.' : '') + '</div>';
+    return;
+  }
+
+  let html = '';
+  stages.forEach((stage, idx) => {
+    const isActive = stage.status === 'now' || stage.status === 'parallel';
+    const badge = STAGE_BADGE[stage.status] || STAGE_BADGE.todo;
+    const dimmedClass = isActive ? '' : 'tm-dimmed';
+    const num = String(idx + 1).padStart(2, '0');
+
+    html += `
+      <div class="tm-row" data-stage-id="${stage.id}" ${isEditMode ? 'draggable="true"' : ''}>
+        <div class="tm-rail ${dimmedClass}">
+          <span class="tm-drag-handle" aria-label="Переместить"><i class="ti ti-grip-vertical"></i></span>
+          <div class="tm-tick-active">
+            <div class="tm-tick-line"></div>
+            <div class="tm-tick-label">
+              <span class="tm-tick-stage">Этап ${num}</span>
+              <span class="tm-tick-name">${escapeHtml(stage.short_name || stage.name)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="tm-card ${isEditMode ? 'editable' : ''}">
+          <div class="tm-card-actions">
+            <button class="icon-btn" data-action="edit-stage" data-id="${stage.id}" title="Редактировать">
+              <i class="ti ti-pencil"></i>
+            </button>
+            <button class="icon-btn danger" data-action="delete-stage" data-id="${stage.id}" title="Удалить">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+          <span class="tm-badge ${badge.class}">
+            ${badge.icon ? `<i class="ti ${badge.icon}" aria-hidden="true" style="font-size: 12px;"></i>` : ''}
+            ${badge.label}
+          </span>
+          <h3>${escapeHtml(stage.name)}</h3>
+          <p>${escapeHtml(stage.description || '')}</p>
+          <div class="tm-meta">
+            <i class="ti ti-calendar" aria-hidden="true"></i>
+            ${escapeHtml(stage.meta || '')}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  container.querySelectorAll('[data-action="edit-stage"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const stage = stages.find(s => s.id === btn.dataset.id);
+      if (stage) openStageEditModal(stage);
+    });
+  });
+
+  container.querySelectorAll('[data-action="delete-stage"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteStage(btn.dataset.id);
+    });
+  });
+
+  if (isEditMode) setupStageDragDrop(container);
+}
+
+function openStageAddModal() {
+  editingStageId = null;
+  document.getElementById('stage-modal-title').textContent = 'Добавить этап';
+  document.getElementById('stage-modal-sub').textContent = 'Заполни данные о новом этапе развития системы';
+  document.getElementById('stage-form-name').value = '';
+  document.getElementById('stage-form-short').value = '';
+  document.getElementById('stage-form-desc').value = '';
+  document.getElementById('stage-form-status').value = 'todo';
+  document.getElementById('stage-form-meta').value = '';
+  document.getElementById('stage-modal').classList.add('active');
+}
+
+function openStageEditModal(stage) {
+  editingStageId = stage.id;
+  document.getElementById('stage-modal-title').textContent = 'Редактировать этап';
+  document.getElementById('stage-modal-sub').textContent = stage.name;
+  document.getElementById('stage-form-name').value = stage.name || '';
+  document.getElementById('stage-form-short').value = stage.short_name || '';
+  document.getElementById('stage-form-desc').value = stage.description || '';
+  document.getElementById('stage-form-status').value = stage.status || 'todo';
+  document.getElementById('stage-form-meta').value = stage.meta || '';
+  document.getElementById('stage-modal').classList.add('active');
+}
+
+function closeStageModal() {
+  document.getElementById('stage-modal').classList.remove('active');
+}
+
+async function saveStage() {
+  const name = document.getElementById('stage-form-name').value.trim();
+  if (!name) {
+    showError('Введи название этапа');
+    return;
+  }
+  const payload = {
+    name,
+    short_name: document.getElementById('stage-form-short').value.trim(),
+    description: document.getElementById('stage-form-desc').value.trim(),
+    status: document.getElementById('stage-form-status').value,
+    meta: document.getElementById('stage-form-meta').value.trim()
+  };
+
+  let error;
+  if (editingStageId) {
+    const r = await supa.from('stages').update(payload).eq('id', editingStageId);
+    error = r.error;
+  } else {
+    const maxPos = stages.length > 0 ? Math.max(...stages.map(s => s.position || 0)) : 0;
+    const r = await supa.from('stages').insert({ ...payload, position: maxPos + 1 });
+    error = r.error;
+  }
+
+  if (error) {
+    showError('Ошибка сохранения: ' + error.message);
+    return;
+  }
+  closeStageModal();
+  await refresh();
+}
+
+async function deleteStage(stageId) {
+  const stage = stages.find(s => s.id === stageId);
+  if (!stage) return;
+  if (!confirm(`Удалить этап «${stage.name}»?`)) return;
+  const { error } = await supa.from('stages').delete().eq('id', stageId);
+  if (error) {
+    showError('Ошибка удаления: ' + error.message);
+    return;
+  }
+  await refresh();
+}
+
+let stageDragSrcEl = null;
+
+function setupStageDragDrop(container) {
+  const rows = container.querySelectorAll('.tm-row[draggable="true"]');
+  rows.forEach(el => {
+    el.addEventListener('dragstart', (e) => {
+      stageDragSrcEl = el;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      container.querySelectorAll('.tm-row').forEach(m => m.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    el.addEventListener('dragenter', () => {
+      if (el !== stageDragSrcEl) el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', () => {
+      el.classList.remove('drag-over');
+    });
+    el.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      el.classList.remove('drag-over');
+      if (!stageDragSrcEl || stageDragSrcEl === el) return;
+      const srcId = stageDragSrcEl.dataset.stageId;
+      const destId = el.dataset.stageId;
+      if (!srcId || !destId) return;
+
+      const newOrder = [];
+      container.querySelectorAll('.tm-row[draggable="true"]').forEach(m => {
+        if (m === stageDragSrcEl) return;
+        newOrder.push(m.dataset.stageId);
+      });
+      const destIndex = newOrder.indexOf(destId);
+      newOrder.splice(destIndex, 0, srcId);
+
+      const updates = newOrder.map((id, i) => supa.from('stages').update({ position: i + 1 }).eq('id', id));
+      const results = await Promise.all(updates);
+      const failed = results.find(r => r.error);
+      if (failed) showError('Ошибка сохранения порядка: ' + failed.error.message);
+      await refresh();
+    });
+  });
+}
+
 function renderSprintOptionsInModal() {
   const select = document.getElementById('form-sprint');
   if (!select) return;
@@ -1456,7 +1856,15 @@ if (isEditMode) {
   document.getElementById('add-btn').style.display = 'inline-flex';
   document.getElementById('add-sprint-btn').style.display = 'inline-flex';
   document.getElementById('add-sprint-btn').addEventListener('click', addSprint);
+  document.getElementById('add-stage-btn').style.display = 'inline-flex';
+  document.getElementById('add-stage-btn').addEventListener('click', openStageAddModal);
 }
+
+document.getElementById('stage-modal-cancel').addEventListener('click', closeStageModal);
+document.getElementById('stage-modal-save').addEventListener('click', saveStage);
+document.getElementById('stage-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'stage-modal') closeStageModal();
+});
 
 refresh();
 </script>
